@@ -1,29 +1,75 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
 
-import {ERC721} from "solmate/tokens/ERC721.sol";
-import {Owned} from "solmate/auth/Owned.sol";
+import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {IERC4883} from "./IERC4883.sol";
-import {Base64} from "./Base64.sol";
-import {Strings} from "./Strings.sol";
+import {Base64} from "@openzeppelin/contracts/utils//Base64.sol";
+import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
+import {IERC165} from "@openzeppelin/contracts/interfaces/IERC165.sol";
 
-//
-// ░█▀█░█▀█░█░█░█▀█░░░█▀▀░█▀█░▀█▀░█▀▀
-// ░█░█░█░█░▀▄▀░█▀█░░░█░░░█▀█░░█░░▀▀█
-// ░▀░▀░▀▀▀░░▀░░▀░▀░░░▀▀▀░▀░▀░░▀░░▀▀▀
-contract PartyPanda is ERC721, Owned, IERC4883 {
+contract PartyPanda is ERC721, Ownable, IERC4883 {
     /// ERRORS
 
     /// @notice Thrown when supply cap reached
     error SupplyCapReached();
 
+    /// @notice Thrown when underpaying
+    error InsufficientPayment();
+
     /// @notice Thrown when token doesn't exist
     error NonexistentToken();
 
+    /// @notice Thrown when attempting to set an invalid token name
+    error InvalidTokenName();
+
+    /// @notice Thrown when attempting to call when not the owner
+    error NotTokenOwner();
+
+    /// @notice Thrown when owner already minted
+    error OwnerAlreadyMinted();
+
+    /// @notice Thrown when token doesn't implement ERC4883
+    error NotERC4883();
+
+    /// @notice Thrown when background already added
+    error BackgroundAlreadyAdded();
+
+    /// @notice Thrown when background already added
+    error BackgroundAlreadyRemoved();
+
     /// EVENTS
+
+    /// @notice Emitted when background added
+    event BackgroundAdded(uint256 tokenId, address backgroundToken, uint256 backgroundTokenId);
+
+    /// @notice Emitted when background removed
+    event BackgroundRemoved(uint256 tokenId, address backgroundToken, uint256 backgroundTokenId);
+
+    /// @notice Emitted when name changed
+    event TokenNameChange(uint256 indexed tokenId, string tokenName);
 
     uint256 public totalSupply;
     uint256 public immutable supplyCap;
+
+    bool private ownerMinted = false;
+    uint256 public immutable ownerAllocation;
+
+    uint256 public immutable price;
+
+    mapping(uint256 => string) private _names;
+
+    struct Token {
+        address tokenAddress;
+        uint256 tokenId;
+    }
+
+    struct Composable {
+        Token background;
+        Token[] accessories;
+    }
+
+    mapping(uint256 => Composable) public composables;
 
     string[] colors = [
         "AliceBlue",
@@ -171,19 +217,54 @@ contract PartyPanda is ERC721, Owned, IERC4883 {
 
     string[] personalities = ["Playful", "Friendly", "Curious", "Energetic", "Gentle", "Zazzy"];
 
-    constructor() ERC721("Party Panda 2.0", "PP2") Owned(0x13ebd3443fa5575F0Eb173e323D8419F7452CfB1) {
+    constructor() ERC721("Party Panda 2.0", "PP2") {
+        _transferOwnership(0xeB10511109053787b3ED6cc02d5Cb67A265806cC);
         supplyCap = 999;
+        price = 0.000888 ether;
+        ownerAllocation = 175;
     }
 
-    function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public view virtual override (ERC721, IERC165) returns (bool) {
         return interfaceId == type(IERC4883).interfaceId || super.supportsInterface(interfaceId);
     }
 
-    function mint() public {
+    function mint(address to) public payable {
+        if (msg.value < price) {
+            revert InsufficientPayment();
+        }
         if (totalSupply >= supplyCap) {
             revert SupplyCapReached();
         }
 
+        _mint();
+    }
+
+    function mint() public payable {
+        mint(msg.sender);
+    }
+
+    function ownerMint() public onlyOwner {
+        if (ownerMinted) {
+            revert OwnerAlreadyMinted();
+        }
+
+        uint256 available = ownerAllocation;
+        if (totalSupply + ownerAllocation > supplyCap) {
+            available = supplyCap - totalSupply;
+        }
+
+        for (uint256 index = 0; index < available;) {
+            _mint();
+
+            unchecked {
+                ++index;
+            }
+        }
+
+        ownerMinted = true;
+    }
+
+    function _mint() private {
         unchecked {
             totalSupply++;
         }
@@ -191,12 +272,17 @@ contract PartyPanda is ERC721, Owned, IERC4883 {
         _safeMint(msg.sender, totalSupply);
     }
 
-    function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
-        ownerOf(tokenId);
+    function withdraw(address to) public onlyOwner {
+        payable(to).transfer(address(this).balance);
+    }
 
-        string memory tokenName_ = string.concat("Nova Cat #", Strings.toString(tokenId));
-        string memory description =
-            "Nova Cats. Cat emoji designed by OpenMoji (the open-source emoji and icon project). License: CC BY-SA 4.0";
+    function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
+        if (!_exists(tokenId)) {
+            revert NonexistentToken();
+        }
+
+        string memory tokenName_ = string.concat(_generateColour(tokenId), " Party Panda");
+        string memory description = "Party Panda 2.0";
 
         string memory image = _generateBase64Image(tokenId);
         string memory attributes = _generateAttributes(tokenId);
@@ -238,51 +324,205 @@ contract PartyPanda is ERC721, Owned, IERC4883 {
 
     function _generateSVG(uint256 tokenId) internal view returns (string memory) {
         string memory svg = string.concat(
-            '<svg id="',
-            "novacat",
-            Strings.toString(tokenId),
-            '" viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg">',
-            renderTokenById(tokenId),
+            '<svg id="partypanda2" width="500" height="500" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">',
+            _generateBackground(tokenId),
+            _generateSVGBody(tokenId),
+            _generateAccessories(tokenId),
             "</svg>"
         );
 
         return svg;
     }
 
+    function _generateSVGBody(uint256 tokenId) internal view returns (string memory) {
+        string memory colourValue = _generateColour(tokenId);
+
+        return string.concat(
+            '<g id="partypanda">' "<desc>Party Panda is Copyright 2022 by Alex Party Panda https://github.com/AlexPartyPanda</desc>"
+'<g fill="', colourValue, '">'
+'<path d="M141.746 364.546C88.0896 338.166 67.7686 339.117 54.9706 378.618C58.0112 418.292 64.3272 429.537 80.7686 437.25C104.636 448.709 170.876 432.772 247.283 422.005C354.846 435.377 424.823 445.054 438.422 437.25C458.371 424.569 466.499 414.297 464.22 378.618C445.099 351.034 433.356 339.684 403.243 356.338L365.719 336.403L141.746 364.546Z" stroke="black" stroke-width="7.62162" stroke-linecap="round" stroke-linejoin="round"/>'
+'<path d="M289.498 101.876C331.996 80.7832 329.868 101.341 328.195 149.954L289.498 101.876Z" stroke="black" stroke-width="7.62162" stroke-linecap="round" stroke-linejoin="round"/>'
+'<path d="M166.371 134.71C159.627 93.6161 168.829 83.778 208.586 96.0128L166.371 134.71Z" stroke="black" stroke-width="7.62162" stroke-linecap="round" stroke-linejoin="round"/>'
+'</g>'
+'<path d="M328.195 149.954C287.152 66.6969 206.241 66.6969 162.853 142.918C142.529 198.634 141.272 222.583 172.234 241.419C236.394 285.393 269.181 279.975 334.058 241.419C342.266 228.521 349.3 182.978 328.195 149.954Z" fill="#FFFAFA" stroke="black" stroke-width="7.62162" stroke-linecap="round" stroke-linejoin="round"/>'
+'<path d="M182.788 416.142L172.234 319.986H305.915V425.523C267.207 438.31 226.501 448.015 182.788 416.142Z" fill="#FFFAFA" stroke="black" stroke-width="7.62162" stroke-linecap="round" stroke-linejoin="round"/>'
+'<path d="M203.895 438.422C188.866 441.956 126.168 466.883 112.43 429.041C113.412 402.012 115.628 378.479 120.983 355.165C128.972 320.386 143.947 286.097 172.234 241.42C237.262 281.898 267.857 272.611 332.885 242.592C361.052 282.666 377.85 317.581 377.663 346.957C377.6 356.842 380.012 367.162 377.663 378.618C377.663 378.618 373.927 400.898 373.927 429.041C373.927 457.185 297.706 465.393 289.498 429.041C281.289 392.69 286.505 410.486 297.706 346.957C263.52 339.96 240.669 340.596 195.687 346.957C202.359 358.413 218.925 434.889 203.895 438.422Z" fill="', colourValue, '" stroke="black" stroke-width="7.62162" stroke-linecap="round" stroke-linejoin="round"/>'
+'<path d="M294.188 133.537C278.558 140.565 272.033 146.383 264.872 160.508C283.729 170.948 293.316 180.152 308.26 203.895L321.159 186.306C315.382 159.43 310.699 146.264 294.188 133.537Z" fill="', colourValue, '" stroke="black" stroke-width="7.62162" stroke-linecap="round" stroke-linejoin="round"/>'
+'<path d="M207.241 139.228C219.2 152.324 213.673 152.092 217.794 160.335C206.104 161.8 197.052 169.693 176.752 195.514C174.004 187.729 173.302 187.34 169.716 175.579C166.131 163.819 195.281 126.131 207.241 139.228Z" fill="', colourValue, '" stroke="black" stroke-width="7.62162" stroke-linecap="round" stroke-linejoin="round"/>'
+'<path d="M244.5 271.287C324.5 271.287 334 160.882 240 160.882C146 160.882 164.5 271.287 244.5 271.287Z" fill="#FFFAFA" stroke="black" stroke-width="7.62"/>'
+'<path d="M215.622 195.687C226.175 185.133 255.491 189.824 260.182 198.032C248.455 209.758 227.348 207.413 215.622 195.687Z" fill="black" stroke="black" stroke-width="7.62162" stroke-linecap="round" stroke-linejoin="round"/>'
+'<path d="M221.485 228.521C242.829 237.607 245.499 236.723 263.7 228.521" stroke="black" stroke-width="7.62162" stroke-linecap="round" stroke-linejoin="round"/>'
+'<circle cx="194.169" cy="165.026" r="9.38108" fill="black"/>'
+'<circle cx="285.98" cy="166.371" r="9.38108" fill="black"/>'
+
+            "</g>"
+        );
+    }
+
+    function _generateBackground(uint256 tokenId) internal view returns (string memory) {
+        string memory background = "";
+
+        if (composables[tokenId].background.tokenAddress != address(0)) {
+            background = IERC4883(composables[tokenId].background.tokenAddress).renderTokenById(
+                composables[tokenId].background.tokenId
+            );
+        }
+
+        return background;
+    }
+
+    function _generateAccessories(uint256 tokenId) internal view returns (string memory) {
+        string memory accessories = "";
+
+        uint256 length = composables[tokenId].accessories.length;
+
+        for (uint256 index = 0; index < length;) {
+            if (composables[tokenId].accessories[index].tokenAddress != address(0)) {
+                accessories = string.concat(
+                    accessories,
+                    IERC4883(composables[tokenId].accessories[index].tokenAddress).renderTokenById(
+                        composables[tokenId].accessories[index].tokenId
+                    )
+                );
+            }
+
+            unchecked {
+                ++index;
+            }
+        }
+
+        return accessories;
+    }
+
     function _generateColour(uint256 tokenId) internal view returns (string memory) {
-        uint256 id = uint256(keccak256(abi.encodePacked("Colour", Strings.toString(tokenId))));
+        uint256 id = uint256(keccak256(abi.encodePacked("Colour", address(this), Strings.toString(tokenId))));
         id = id % colors.length;
         return colors[id];
     }
 
     function _generatePersonality(uint256 tokenId) internal view returns (string memory) {
-        uint256 id = uint256(keccak256(abi.encodePacked("Colour", Strings.toString(tokenId))));
+        uint256 id = uint256(keccak256(abi.encodePacked("Personality", address(this), Strings.toString(tokenId))));
         id = id % personalities.length;
         return personalities[id];
     }
 
     function renderTokenById(uint256 tokenId) public view returns (string memory) {
-        string memory colourValue = _generateColour(tokenId);
+        if (!_exists(tokenId)) {
+            revert NonexistentToken();
+        }
 
-        return string.concat(
-            '<g id="nounsglasses">' '<g id="color">' '<path fill="',
-            colourValue,
-            '" d="m47.25 44.38 2.658 2.696 5.591 1.245-1.291 4.058 0.75 3.218 2.208-0.7136 2.625-4.979 1.208-5.154c-1.059-1.656-2.403-3.314-3.157-4.998-1.79-1.403-2.502-3.671-3.718-5.915z"/>'
-            '<path fill="',
-            colourValue,
-            '" d="m30.95 43.79-1.819 2.842-1.583 7.534-1.602 1.754-2.94-1.088-0.4713-4.959s0.822-4.787 1.322-6.823c0.5-2.036 5.149-2.382 5.149-2.382z"/>'
-            '<path fill="',
-            colourValue,
-            '" d="m67.59 16.75-2.667-0.5572-4.29 1.557-0.7292 4.406-0.3746 3.141-3.25 3.822-2.645 1.549-1.761 0.0057c-0.0405-0.0547-0.0751-0.1098-0.1174-0.1643h-3.289l-5.323-2.035-5.971-2.086-9.892 0.5412-6.442 1.238-6.324-2.754-4.26-2.829-3.623 0.739 1.75 3.417-3.318 5.1 0.9412 4.237 5.09 0.1184 1.82 0.4315 3.396-1.197-0.2628 3.238 1.109 2.738-1.109 1.983-3.71 2.949-0.4855 4.093 2.798 3.289s3.938-0.3125 2.344-4.577l2.799-2.733 4.747-1.234 1.973-1.217 4.436 0.7886h8.409l2.13 3.404-1.424 4.683 0.0954 2.759 2.556-0.2704 2.948-3.93 1.937-2.57v-3.489l3.639-3.572 2.349-4.939s0.0198-0.1385 0.0331-0.3762l0.0119 0.0164s6.106-3.004 8.33-7.525c3.597-5.054-0.677-9.975 4.438-8.312 1.289 0.4189 2.75-2.25 1.187-3.875z"/>'
-            "</g>"
-            '<g id="line" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="2">'
-            '<path d="m12.46 35.74c-2.333 1-4.917 0.8333-4.917 0.8333-1.677 0.1458-3.115-4.01-2.485-4.733l3.318-5.1-1.75-3.417s5.008-1.415 7.883 2.09c0.3444 0.42 0.7943 0.7429 1.279 0.9871 0.0298 0.015 0.0602 0.0302 0.0912 0.0456 2.593 1.289 5.546 1.571 8.385 0.9981 7.222-1.458 14.07-1.37 21.7 2.212 7.625 3.583 14.83-2.25 13.94-7.5-0.793-4.647 3.562-7.583 6.75-5"/>'
-            '<path d="m16.05 48.82c0.6006-2.206 8.491-3.648 8.491-3.648s3.228-1.201 1.426-4.504"/>'
-            '<path d="m18.3 33.24c-1.543 1.834-3.893 4.803-0.44 9.158 0 0-6.756 2.853-6.006 8.033 0 0 0.3624 2.476 2.402 2.402"/>'
-            '<path d="m23.5 50.03c-1.156 7.254 2.386 6.055 3.017 5.661 1.148-0.7173 1.848-9.854 3.952-11.31 1.592-1.104 8.167-0.3021 8.167-0.3021"/>'
-            '<path d="m38.44 41.33c0.0911 1.742 0.7529 3.402 1.734 4.845 0.6616 0.9727 1.803 2.32 1.453 2.985-4.479 8.5 0.6224 7.022 1.083 6.167 3.188-5.917 6.125-4.104 4.647-10.52 0 0 5.27-1.81 5.52-7.977"/>'
-            '<path d="m48.15 45.59s2.367 3.204 7.758 2.693c0 0-3.326 6.762 0 7.62 1.917 0.4941 4.722-11.16 4.722-11.16s-2.667-2.45-3.583-4.366"/>'
-            "</g>" "</g>"
-        );
+        return string.concat(_generateBackground(tokenId), _generateSVGBody(tokenId), _generateAccessories(tokenId));
+    }
+
+    function addBackground(uint256 tokenId, address backgroundTokenAddress, uint256 backgroundTokenId) public {
+        address tokenOwner = ownerOf(tokenId);
+        if (tokenOwner != msg.sender) {
+            revert NotTokenOwner();
+        }
+
+        IERC4883 backgroundToken = IERC4883(backgroundTokenAddress);
+
+        if (!backgroundToken.supportsInterface(type(IERC4883).interfaceId)) {
+            revert NotERC4883();
+        }
+
+        if (composables[tokenId].background.tokenAddress != address(0)) {
+            revert BackgroundAlreadyAdded();
+        }
+
+        composables[tokenId].background = Token(backgroundTokenAddress, backgroundTokenId);
+
+        backgroundToken.safeTransferFrom(tokenOwner, address(this), backgroundTokenId);
+
+        emit BackgroundAdded(tokenId, backgroundTokenAddress, backgroundTokenId);
+    }
+
+    function removeBackground(uint256 tokenId) public {
+        address tokenOwner = ownerOf(tokenId);
+        if (tokenOwner != msg.sender) {
+            revert NotTokenOwner();
+        }
+
+        Token memory background = composables[tokenId].background;
+
+        if (background.tokenAddress == address(0)) {
+            revert BackgroundAlreadyRemoved();
+        }
+
+        composables[tokenId].background = Token(address(0), 0);
+
+        IERC4883 backgroundToken = IERC4883(background.tokenAddress);
+        backgroundToken.safeTransferFrom(address(this), tokenOwner, background.tokenId);
+
+        emit BackgroundRemoved(tokenId, background.tokenAddress, background.tokenId);
+    }
+
+    function tokenName(uint256 tokenId) public view returns (string memory) {
+        string memory _name = _names[tokenId];
+
+        bytes memory b = bytes(_name);
+        if (b.length < 1) {
+            _name = string.concat(name(), " #", Strings.toString(tokenId));
+        }
+
+        return _name;
+    }
+
+    // Based on The HashMarks
+    // https://etherscan.io/address/0xc2c747e0f7004f9e8817db2ca4997657a7746928#code#F7#L311
+    function changeTokenName(uint256 tokenId, string memory newTokenName) public {
+        if (ownerOf(tokenId) != msg.sender) {
+            revert NotTokenOwner();
+        }
+
+        if (!validateTokenName(newTokenName)) {
+            revert InvalidTokenName();
+        }
+
+        _names[tokenId] = newTokenName;
+
+        emit TokenNameChange(tokenId, newTokenName);
+    }
+
+    // From The HashMarks
+    // https://etherscan.io/address/0xc2c747e0f7004f9e8817db2ca4997657a7746928#code#F7#L612
+    function validateTokenName(string memory str) public pure returns (bool) {
+        bytes memory b = bytes(str);
+        if (b.length < 1) {
+            return false;
+        }
+        if (b.length > 25) {
+            return false;
+        } // Cannot be longer than 25 characters
+        if (b[0] == 0x20) {
+            return false;
+        } // Leading space
+        if (b[b.length - 1] == 0x20) {
+            return false;
+        } // Trailing space
+
+        bytes1 lastChar = b[0];
+
+        for (uint256 i; i < b.length; i++) {
+            bytes1 char = b[i];
+
+            if (char == 0x20 && lastChar == 0x20) {
+                return false;
+            } // Cannot contain continous spaces
+
+            if (
+                !(char >= 0x30 && char <= 0x39) //9-0
+                    && !(char >= 0x41 && char <= 0x5A) //A-Z
+                    && !(char >= 0x61 && char <= 0x7A) //a-z
+                    && !(char == 0x20)
+            ) {
+                //space
+                return false;
+            }
+
+            lastChar = char;
+        }
+
+        return true;
     }
 }
