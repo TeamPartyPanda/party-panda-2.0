@@ -80,7 +80,7 @@ contract PartyPanda is ERC4883, Colours, ERC721Holder {
 
     function _generateSVG(uint256 tokenId) internal view virtual override returns (string memory) {
         string memory svg = string.concat(
-            '<svg id="partypanda-2" width="500" height="500" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">',
+            '<svg id="partypanda-2-0" width="500" height="500" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">',
             _generateBackground(tokenId),
             _generateSVGBody(tokenId),
             _generateAccessories(tokenId),
@@ -94,7 +94,7 @@ contract PartyPanda is ERC4883, Colours, ERC721Holder {
         string memory colourValue = _generateColour(tokenId);
 
         return string.concat(
-            '<g id="partypanda-2-',
+            '<g id="partypanda-2-0-',
             Strings.toString(tokenId),
             '">' "<desc>Party Panda is Copyright 2022 by Alex Party Panda https://github.com/AlexPartyPanda</desc>"
             '<g stroke="black" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">' '<g fill="',

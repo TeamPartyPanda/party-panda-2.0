@@ -44,8 +44,7 @@ contract Box is ERC4883, Colours {
     }
 
     function _generateColour(uint256 tokenId) internal view returns (string memory) {
-        uint256 id =
-            uint256(keccak256(abi.encodePacked("Box", address(this), Strings.toString(tokenId))));
+        uint256 id = uint256(keccak256(abi.encodePacked("Box", address(this), Strings.toString(tokenId))));
         id = id % colours.length;
         return colours[id];
     }
