@@ -13,9 +13,7 @@ contract Box is ERC4883, Colours {
 
     /// EVENTS
 
-    constructor()
-        ERC4883("Box", "BOX", 0.00042 ether, 0xeB10511109053787b3ED6cc02d5Cb67A265806cC, 100, 1000)
-    {}
+    constructor() ERC4883("Box", "BOX", 0.00042 ether, 0xeB10511109053787b3ED6cc02d5Cb67A265806cC, 100, 1000) {}
 
     function _generateAttributes(uint256 tokenId) internal view virtual override returns (string memory) {
         string memory attributes = string.concat('{"trait_type": "colour", "value": "', _generateColour(tokenId), '"}');
@@ -39,7 +37,7 @@ contract Box is ERC4883, Colours {
         return string.concat(
             '<g id="box',
             Strings.toString(tokenId),
-            '">' "<desc>Boxy box</desc>" '<rect x="20" y="20" width="460" height="460" fill="',
+            '">' "<desc>Just a box</desc>" '<rect x="20" y="20" width="460" height="460" fill="',
             colourValue,
             '" stroke="black" stroke-width="10" stroke-linejoin="round" />' "</g>"
         );
@@ -47,7 +45,7 @@ contract Box is ERC4883, Colours {
 
     function _generateColour(uint256 tokenId) internal view returns (string memory) {
         uint256 id =
-            uint256(keccak256(abi.encodePacked("Nouns Glasses Colour", address(this), Strings.toString(tokenId))));
+            uint256(keccak256(abi.encodePacked("Box", address(this), Strings.toString(tokenId))));
         id = id % colours.length;
         return colours[id];
     }

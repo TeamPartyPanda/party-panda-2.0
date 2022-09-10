@@ -25,7 +25,6 @@ contract QAPartyPandaScript is Script, ERC721Holder {
         background.approve(address(token), 1);
         token.addBackground(1, address(background), 1);
 
-
         accessory.approve(address(token), 1);
         token.addAccessory(1, address(accessory), 1);
 

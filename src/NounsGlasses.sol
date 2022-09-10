@@ -41,13 +41,14 @@ contract NounsGlasses is ERC4883, Colours {
             Strings.toString(tokenId),
             '">' "<desc>Nouns Glasses are inspired and derived from Nouns</desc>" '<g stroke="',
             colourValue,
-            '" stroke-width="15">' '<rect x="255.5" y="137.5" width="75" height="75" />'
-            '<line x1="105.5" y1="205" x2="105.5" y2="175" />' '<line x1="98" y1="167.5" x2="248" y2="167.5" />'
-            '<rect x="150.5" y="137.5" width="75" height="75" />' "</g>"
-            '<rect x="293" y="145" width="30" height="60" fill="black"/>'
-            '<rect x="263" y="145" width="30" height="60" fill="white"/>'
-            '<rect x="188" y="145" width="30" height="60" fill="black"/>'
-            '<rect x="158" y="145" width="30" height="60" fill="white"/>' "</g>"
+            '" >' '<rect x="294" y="141" width="30" height="60" fill="black"/>'
+            '<rect x="264" y="141" width="30" height="60" fill="white"/>'
+            '<rect x="256.5" y="133.5" width="75" height="75" stroke-width="15" fill="none"/>'
+            '<line x1="106.5" y1="201" x2="106.5" y2="171" stroke-width="15"/>'
+            '<line x1="99" y1="163.5" x2="249" y2="163.5" stroke-width="15"/>'
+            '<rect x="151.5" y="133.5" width="75" height="75" stroke-width="15" fill="none" />'
+            '<rect x="159" y="141" width="30" height="60" fill="white"/>'
+            '<rect x="189" y="141" width="30" height="60" fill="black"/>' "</g></g>"
         );
     }
 
