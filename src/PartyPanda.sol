@@ -64,6 +64,10 @@ contract PartyPanda is ERC4883, Colours, ERC721Holder {
         ERC4883("Party Panda 2.0", "PP2", 0.000888 ether, 0xeB10511109053787b3ED6cc02d5Cb67A265806cC, 175, 4883)
     {}
 
+    function _generateDescription(uint256 tokenId) internal view virtual override returns (string memory) {
+        return name();
+    }
+
     function _generateAttributes(uint256 tokenId) internal view virtual override returns (string memory) {
         string memory attributes = string.concat(
             '{"trait_type": "colour", "value": "',

@@ -15,6 +15,10 @@ contract Crown is ERC4883, Colours {
 
     constructor() ERC4883("Crown", "CRWN", 0.000888 ether, 0xeB10511109053787b3ED6cc02d5Cb67A265806cC, 200, 2020) {}
 
+    function _generateDescription(uint256 tokenId) internal view virtual override returns (string memory) {
+        return name();
+    }
+
     function _generateAttributes(uint256 tokenId) internal view virtual override returns (string memory) {
         string memory attributes = string.concat('{"trait_type": "colour", "value": "', _generateColour(tokenId), '"}');
 
