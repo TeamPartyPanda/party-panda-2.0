@@ -15,17 +15,29 @@ contract PartyPanda is ERC4883, Colours, ERC721Holder {
     /// @notice Thrown when attempting to set an invalid token name
     error InvalidTokenName();
 
+    /// @notice Thrown when not the accessory owner
+    error NotAccessoryOwner();
+
     /// @notice Thrown when accessory already added
     error AccessoryAlreadyAdded();
 
-    /// @notice Thrown when accessory already removed
-    error AccessoryAlreadyRemoved();
+    /// @notice Thrown when accessory not found
+    error AccessoryNotFound();
+
+    /// @notice Thrown when maximum number of accessories already added
+    error MaximumAccessories();
+
+    /// @notice Thrown when not the background owner
+    error NotBackgroundOwner();
 
     /// @notice Thrown when background already added
     error BackgroundAlreadyAdded();
 
     /// @notice Thrown when background already removed
     error BackgroundAlreadyRemoved();
+
+    /// @notice Thrown when token doesn't implement ERC4883
+    error NotERC4883();
 
     /// EVENTS
 
@@ -53,8 +65,10 @@ contract PartyPanda is ERC4883, Colours, ERC721Holder {
 
     struct Composable {
         Token background;
-        Token[3] accessories;
+        Token[] accessories;
     }
+
+    uint256 constant MAX_ACCESSORIES = 3;
 
     mapping(uint256 => Composable) public composables;
 
@@ -139,17 +153,14 @@ contract PartyPanda is ERC4883, Colours, ERC721Holder {
     function _generateAccessories(uint256 tokenId) internal view virtual returns (string memory) {
         string memory accessories = "";
 
-        uint256 length = composables[tokenId].accessories.length;
-
-        for (uint256 index = 0; index < length;) {
-            if (composables[tokenId].accessories[index].tokenAddress != address(0)) {
-                accessories = string.concat(
-                    accessories,
-                    IERC4883(composables[tokenId].accessories[index].tokenAddress).renderTokenById(
-                        composables[tokenId].accessories[index].tokenId
-                    )
-                );
-            }
+        uint256 accessoryCount = composables[tokenId].accessories.length;
+        for (uint256 index = 0; index < accessoryCount;) {
+            accessories = string.concat(
+                accessories,
+                IERC4883(composables[tokenId].accessories[index].tokenAddress).renderTokenById(
+                    composables[tokenId].accessories[index].tokenId
+                )
+            );
 
             unchecked {
                 ++index;
@@ -185,36 +196,81 @@ contract PartyPanda is ERC4883, Colours, ERC721Holder {
             revert NotTokenOwner();
         }
 
+        // check for maximum accessories
+        uint256 accessoryCount = composables[tokenId].accessories.length;
+
+        if (accessoryCount == MAX_ACCESSORIES) {
+            revert MaximumAccessories();
+        }
+
         IERC4883 accessoryToken = IERC4883(accessoryTokenAddress);
 
         if (!accessoryToken.supportsInterface(type(IERC4883).interfaceId)) {
             revert NotERC4883();
         }
 
-        if (composables[tokenId].accessories[0].tokenAddress != address(0)) {
-            revert AccessoryAlreadyAdded();
+        if (accessoryToken.ownerOf(accessoryTokenId) != msg.sender) {
+            revert NotAccessoryOwner();
         }
 
-        composables[tokenId].accessories[0] = Token(accessoryTokenAddress, accessoryTokenId);
+        // check if accessory already added
+        for (uint256 index = 0; index < accessoryCount;) {
+            if (composables[tokenId].accessories[index].tokenAddress == accessoryTokenAddress) {
+                revert AccessoryAlreadyAdded();
+            }
+
+            unchecked {
+                ++index;
+            }
+        }
+
+        // add accessory
+        composables[tokenId].accessories.push(Token(accessoryTokenAddress, accessoryTokenId));
 
         accessoryToken.safeTransferFrom(tokenOwner, address(this), accessoryTokenId);
 
         emit AccessoryAdded(tokenId, accessoryTokenAddress, accessoryTokenId);
     }
 
-    function removeAccessory(uint256 tokenId) public {
+    function removeAccessory(uint256 tokenId, address accessoryTokenAddress, uint256 accessoryTokenId) public {
         address tokenOwner = ownerOf(tokenId);
         if (tokenOwner != msg.sender) {
             revert NotTokenOwner();
         }
 
-        Token memory accessory = composables[tokenId].accessories[0];
+        // find accessory
+        uint256 accessoryCount = composables[tokenId].accessories.length;
+        bool accessoryFound = false;
+        uint256 index = 0;
+        for (; index < accessoryCount;) {
+            if (
+                composables[tokenId].accessories[index].tokenAddress == accessoryTokenAddress
+                    && composables[tokenId].accessories[index].tokenId == accessoryTokenId
+            ) {
+                accessoryFound = true;
+                break;
+            }
 
-        if (accessory.tokenAddress == address(0)) {
-            revert AccessoryAlreadyRemoved();
+            unchecked {
+                ++index;
+            }
         }
 
-        composables[tokenId].accessories[0] = Token(address(0), 0);
+        if (!accessoryFound) {
+            revert AccessoryNotFound();
+        }
+
+        Token memory accessory = composables[tokenId].accessories[index];
+
+        // remove accessory
+        for (uint256 i = index; i < accessoryCount - 1;) {
+            composables[tokenId].accessories[i] = composables[tokenId].accessories[i + 1];
+
+            unchecked {
+                ++i;
+            }
+        }
+        composables[tokenId].accessories.pop();
 
         IERC4883 accessoryToken = IERC4883(accessory.tokenAddress);
         accessoryToken.safeTransferFrom(address(this), tokenOwner, accessory.tokenId);
@@ -232,6 +288,10 @@ contract PartyPanda is ERC4883, Colours, ERC721Holder {
 
         if (!backgroundToken.supportsInterface(type(IERC4883).interfaceId)) {
             revert NotERC4883();
+        }
+
+        if (backgroundToken.ownerOf(backgroundTokenId) != msg.sender) {
+            revert NotBackgroundOwner();
         }
 
         if (composables[tokenId].background.tokenAddress != address(0)) {

@@ -16,7 +16,7 @@ contract Crown is ERC4883, Colours {
     constructor() ERC4883("Crown", "CRWN", 0.000888 ether, 0xeB10511109053787b3ED6cc02d5Cb67A265806cC, 200, 2020) {}
 
     function _generateDescription(uint256 tokenId) internal view virtual override returns (string memory) {
-        return name();
+        return "Crown emoji designed by OpenMoji (the open-source emoji and icon project). License: CC BY-SA 4.0";
     }
 
     function _generateAttributes(uint256 tokenId) internal view virtual override returns (string memory) {
@@ -39,7 +39,7 @@ contract Crown is ERC4883, Colours {
         string memory colourValue = _generateColour(tokenId);
 
         return string.concat(
-            '<g id="crown',
+            '<g id="crown-',
             Strings.toString(tokenId),
             '" fill="none">' "<desc>Crown emoji designed by OpenMoji. License: CC BY-SA 4.0</desc>"
             '<path d="M307.056 100.53H179.944v9.083h127.112v-9.083Zm-63.564-38.27c5.485 0 9.931-2.798 9.931-6.25s-4.446-6.25-9.931-6.25c-5.484 0-9.93 2.798-9.93 6.25s4.446 6.25 9.93 6.25Z" fill="#fff"/>'
@@ -61,8 +61,7 @@ contract Crown is ERC4883, Colours {
     }
 
     function _generateColour(uint256 tokenId) internal view returns (string memory) {
-        uint256 id =
-            uint256(keccak256(abi.encodePacked("Nouns Glasses Colour", address(this), Strings.toString(tokenId))));
+        uint256 id = uint256(keccak256(abi.encodePacked("Crown", address(this), Strings.toString(tokenId))));
         id = id % colours.length;
         return colours[id];
     }

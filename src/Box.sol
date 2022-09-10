@@ -35,7 +35,7 @@ contract Box is ERC4883, Colours {
         string memory colourValue = _generateColour(tokenId);
 
         return string.concat(
-            '<g id="box',
+            '<g id="box-',
             Strings.toString(tokenId),
             '">' "<desc>Just a box</desc>" '<rect x="20" y="20" width="460" height="460" fill="',
             colourValue,

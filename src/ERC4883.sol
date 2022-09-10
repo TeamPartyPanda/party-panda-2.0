@@ -26,9 +26,6 @@ abstract contract ERC4883 is ERC721, Ownable, IERC4883 {
     /// @notice Thrown when owner already minted
     error OwnerAlreadyMinted();
 
-    /// @notice Thrown when token doesn't implement ERC4883
-    error NotERC4883();
-
     /// EVENTS
 
     uint256 public totalSupply;

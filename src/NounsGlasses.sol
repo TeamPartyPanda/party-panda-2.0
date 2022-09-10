@@ -41,7 +41,7 @@ contract NounsGlasses is ERC4883, Colours {
         string memory colourValue = _generateColour(tokenId);
 
         return string.concat(
-            '<g id="nounsglasses',
+            '<g id="nounsglasses-',
             Strings.toString(tokenId),
             '">' "<desc>Nouns Glasses are inspired and derived from Nouns</desc>" '<g stroke="',
             colourValue,
