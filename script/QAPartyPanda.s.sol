@@ -4,6 +4,7 @@ pragma solidity ^0.8.13;
 import "forge-std/Script.sol";
 import "../src/PartyPanda.sol";
 import "../src/NounsGlasses.sol";
+import "../src/Crown.sol";
 import "../src/Box.sol";
 import {ERC721Holder} from "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 
@@ -19,14 +20,20 @@ contract QAPartyPandaScript is Script, ERC721Holder {
         Box background = new Box();
         background.mint{value: background.price()}();
 
-        NounsGlasses accessory = new NounsGlasses();
-        accessory.mint{value: accessory.price()}();
+        NounsGlasses glasses = new NounsGlasses();
+        glasses.mint{value: glasses.price()}();
+
+        Crown crown = new Crown();
+        crown.mint{value: crown.price()}();
 
         background.approve(address(token), 1);
         token.addBackground(1, address(background), 1);
 
-        accessory.approve(address(token), 1);
-        token.addAccessory(1, address(accessory), 1);
+        glasses.approve(address(token), 1);
+        //token.addAccessory(1, address(glasses), 1);
+
+        crown.approve(address(token), 1);
+        token.addAccessory(1, address(crown), 1);
 
         console.log(token.tokenURI(1));
 
