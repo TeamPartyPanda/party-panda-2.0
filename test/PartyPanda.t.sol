@@ -18,10 +18,14 @@ contract PartyPanda2Test is Test, ERC721Holder {
     MockERC4883 public accessory3;
     MockERC4883 public accessory4;
 
-    string constant TOKEN_NAME = "Token Name";
+    string public constant NAME = "Party Panda 2.0";
+    string public constant SYMBOL = "PP2";
+    uint256 public constant OWNER_ALLOCATION = 100;
+    uint256 public constant SUPPLY_CAP = 1000;
     uint256 constant PRICE = 0.000888 ether;
     address constant OWNER = 0xeB10511109053787b3ED6cc02d5Cb67A265806cC;
 
+    string constant TOKEN_NAME = "Token Name";
     address constant OTHER_ADDRESS = address(23);
 
     function setUp() public {
@@ -35,8 +39,8 @@ contract PartyPanda2Test is Test, ERC721Holder {
     }
 
     function testMetadata() public {
-        assertEq(token.name(), "Party Panda 2.0");
-        assertEq(token.symbol(), "PP2");
+        assertEq(token.name(), NAME);
+        assertEq(token.symbol(), SYMBOL);
         assertEq(token.price(), PRICE);
     }
 
@@ -46,6 +50,19 @@ contract PartyPanda2Test is Test, ERC721Holder {
 
     function testSupportsERC4883() public {
         assertEq(token.supportsInterface(type(IERC4883).interfaceId), true);
+    }
+
+    function testWithdraw(uint96 amount) public {
+        address recipient = address(2);
+
+        vm.assume(amount >= PRICE);
+        token.mint{value: amount}();
+
+        vm.prank(OWNER);
+        token.withdraw(recipient);
+
+        assertEq(address(recipient).balance, amount);
+        assertEq(address(token).balance, 0 ether);
     }
 
     /// Token Name

@@ -31,7 +31,7 @@ contract PartyPanda2 is ERC4883Composer, Colours, ERC721Holder {
 
     mapping(uint256 => string) private _names;
 
-    string[] personalities = ["Playful", "Friendly", "Curious", "Energetic", "Gentle", "Zazzy"];
+    string[] personalities = ["Happy", "Bubbly", "Peaceful", "Curious", "Cute", "Friendly", "Caring", "Dynamic", "Quirky", "Stoic", "Funny", "Energetic", "Thoughtful", "Passionate", "Gentle", "Zazzy"];
 
     constructor()
         ERC4883Composer("Party Panda 2.0", "PP2", 0.000888 ether, 0xeB10511109053787b3ED6cc02d5Cb67A265806cC, 175, 4883)
@@ -51,8 +51,7 @@ contract PartyPanda2 is ERC4883Composer, Colours, ERC721Holder {
             _generatePartyValue(tokenId),
             "}",
             _generateAccessoryAttributes(tokenId),
-            _generateBackgroundAttributes(tokenId),
-            '"}'
+            _generateBackgroundAttributes(tokenId)
         );
 
         return string.concat('"attributes": [', attributes, "]");
