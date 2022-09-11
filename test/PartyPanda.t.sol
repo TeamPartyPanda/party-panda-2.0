@@ -3,6 +3,7 @@ pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
 import "../src/ERC4883.sol";
+import "../src/ERC4883Composer.sol";
 import "../src/PartyPanda2.sol";
 import "./mocks/MockERC4883.sol";
 import "./mocks/MockERC721.sol";
@@ -95,7 +96,7 @@ contract PartyPanda2Test is Test, ERC721Holder {
         token.addAccessory(tokenId, address(accessory3), 1);
 
         accessory4.approve(address(token), 1);
-        vm.expectRevert(PartyPanda2.MaximumAccessories.selector);
+        vm.expectRevert(ERC4883Composer.MaximumAccessories.selector);
         token.addAccessory(tokenId, address(accessory4), 1);
     }
 
@@ -131,7 +132,7 @@ contract PartyPanda2Test is Test, ERC721Holder {
 
         erc721.approve(address(token), accessoryTokenId);
 
-        vm.expectRevert(PartyPanda2.NotERC4883.selector);
+        vm.expectRevert(ERC4883Composer.NotERC4883.selector);
         token.addAccessory(tokenId, address(erc721), accessoryTokenId);
     }
 
@@ -146,7 +147,7 @@ contract PartyPanda2Test is Test, ERC721Holder {
 
         accessory1.approve(address(token), 2);
 
-        vm.expectRevert(PartyPanda2.AccessoryAlreadyAdded.selector);
+        vm.expectRevert(ERC4883Composer.AccessoryAlreadyAdded.selector);
         token.addAccessory(tokenId, address(accessory1), 2);
     }
 
@@ -160,7 +161,7 @@ contract PartyPanda2Test is Test, ERC721Holder {
         accessory1.approve(address(token), accessoryTokenId);
         vm.stopPrank();
 
-        vm.expectRevert(PartyPanda2.NotAccessoryOwner.selector);
+        vm.expectRevert(ERC4883Composer.NotAccessoryOwner.selector);
         token.addAccessory(tokenId, address(accessory1), accessoryTokenId);
     }
 
@@ -232,7 +233,7 @@ contract PartyPanda2Test is Test, ERC721Holder {
         token.mint{value: PRICE}();
         accessory1.mint();
 
-        vm.expectRevert(PartyPanda2.AccessoryNotFound.selector);
+        vm.expectRevert(ERC4883Composer.AccessoryNotFound.selector);
         token.removeAccessory(tokenId, address(accessory1), accessoryTokenId);
     }
 
@@ -244,7 +245,7 @@ contract PartyPanda2Test is Test, ERC721Holder {
         token.mint{value: PRICE}();
         accessory1.mint();
 
-        vm.expectRevert(PartyPanda2.AccessoryNotFound.selector);
+        vm.expectRevert(ERC4883Composer.AccessoryNotFound.selector);
         token.removeAccessory(tokenId, address(accessory1), otherTokenId);
     }
 
@@ -265,7 +266,7 @@ contract PartyPanda2Test is Test, ERC721Holder {
         accessory3.approve(address(token), 1);
         token.addAccessory(tokenId, address(accessory3), 1);
 
-        vm.expectRevert(PartyPanda2.AccessoryNotFound.selector);
+        vm.expectRevert(ERC4883Composer.AccessoryNotFound.selector);
         token.removeAccessory(tokenId, address(accessory4), 1);
     }
 
@@ -369,7 +370,7 @@ contract PartyPanda2Test is Test, ERC721Holder {
 
         erc721.approve(address(token), backgroundTokenId);
 
-        vm.expectRevert(PartyPanda2.NotERC4883.selector);
+        vm.expectRevert(ERC4883Composer.NotERC4883.selector);
         token.addBackground(tokenId, address(erc721), backgroundTokenId);
     }
 
@@ -384,7 +385,7 @@ contract PartyPanda2Test is Test, ERC721Holder {
 
         background.approve(address(token), 2);
 
-        vm.expectRevert(PartyPanda2.BackgroundAlreadyAdded.selector);
+        vm.expectRevert(ERC4883Composer.BackgroundAlreadyAdded.selector);
         token.addBackground(tokenId, address(background), 2);
     }
 
@@ -398,7 +399,7 @@ contract PartyPanda2Test is Test, ERC721Holder {
         background.approve(address(token), backgroundTokenId);
         vm.stopPrank();
 
-        vm.expectRevert(PartyPanda2.NotBackgroundOwner.selector);
+        vm.expectRevert(ERC4883Composer.NotBackgroundOwner.selector);
         token.addBackground(tokenId, address(background), backgroundTokenId);
     }
 
@@ -449,7 +450,7 @@ contract PartyPanda2Test is Test, ERC721Holder {
         token.addBackground(tokenId, address(background), backgroundTokenId);
         token.removeBackground(tokenId);
 
-        vm.expectRevert(PartyPanda2.BackgroundAlreadyRemoved.selector);
+        vm.expectRevert(ERC4883Composer.BackgroundAlreadyRemoved.selector);
         token.removeBackground(tokenId);
     }
 

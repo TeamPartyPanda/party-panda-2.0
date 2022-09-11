@@ -15,6 +15,14 @@ contract MockERC4883 is ERC4883 {
         ERC4883(name_, symbol_, price_, owner_, ownerAllocation_, supplyCap_)
     {}
 
+    function _generateDescription(uint256 tokenId) internal view virtual override returns (string memory) {
+        return name();
+    }
+
+    function _generateAttributes(uint256 tokenId) internal view virtual override returns (string memory) {
+        return string.concat('"attributes": []');
+    }
+
     function _generateSVG(uint256 tokenId) internal view virtual override returns (string memory) {
         return "<svg></svg>";
     }

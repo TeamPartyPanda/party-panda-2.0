@@ -138,23 +138,17 @@ abstract contract ERC4883 is ERC721, Ownable, IERC4883 {
         return string.concat(name(), " #", Strings.toString(tokenId));
     }
 
-    function _generateDescription(uint256 tokenId) internal view virtual returns (string memory) {
-        return name();
-    }
+    function _generateDescription(uint256 tokenId) internal view virtual returns (string memory);
 
-    function _generateAttributes(uint256 tokenId) internal view virtual returns (string memory) {
-        string memory attributes = "{}";
-
-        return string.concat('"attributes": [', attributes, "]");
-    }
-
-    function _generateBase64Image(uint256 tokenId) internal view returns (string memory) {
-        return Base64.encode(bytes(_generateSVG(tokenId)));
-    }
+    function _generateAttributes(uint256 tokenId) internal view virtual returns (string memory);
 
     function _generateSVG(uint256 tokenId) internal view virtual returns (string memory);
 
     function _generateSVGBody(uint256 tokenId) internal view virtual returns (string memory);
+
+    function _generateBase64Image(uint256 tokenId) internal view returns (string memory) {
+        return Base64.encode(bytes(_generateSVG(tokenId)));
+    }
 
     function renderTokenById(uint256 tokenId) public view virtual returns (string memory) {
         if (!_exists(tokenId)) {

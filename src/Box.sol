@@ -15,6 +15,10 @@ contract Box is ERC4883, Colours {
 
     constructor() ERC4883("Box", "BOX", 0.00042 ether, 0xeB10511109053787b3ED6cc02d5Cb67A265806cC, 100, 1000) {}
 
+    function _generateDescription(uint256 tokenId) internal view virtual override returns (string memory) {
+        return "Box";
+    }
+
     function _generateAttributes(uint256 tokenId) internal view virtual override returns (string memory) {
         string memory attributes = string.concat('{"trait_type": "colour", "value": "', _generateColour(tokenId), '"}');
 
