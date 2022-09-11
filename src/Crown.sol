@@ -24,7 +24,7 @@ contract Crown is ERC4883, Colours {
     }
 
     function _generateAttributes(uint256 tokenId) internal view virtual override returns (string memory) {
-        string memory attributes = string.concat('{"trait_type": "colour", "value": "', _generateColour(tokenId), '"}');
+        string memory attributes = string.concat('{"trait_type": "Colour", "value": "', _generateColour(tokenId), '"}');
 
         return string.concat('"attributes": [', attributes, "]");
     }

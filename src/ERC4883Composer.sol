@@ -101,7 +101,7 @@ abstract contract ERC4883Composer is ERC4883 {
             if (bytes(tokenName).length != 0) {
                 attributes = string.concat(
                     attributes,
-                    ', {"trait_type": "accessory',
+                    ', {"trait_type": "Accessory',
                     Strings.toString(index + 1),
                     '", "value": "',
                     tokenName,
@@ -123,7 +123,7 @@ abstract contract ERC4883Composer is ERC4883 {
         string memory tokenName = _generateTokenName(composables[tokenId].background.tokenAddress);
 
         if (bytes(tokenName).length != 0) {
-            attributes = string.concat(', {"trait_type": "background", "value": "', tokenName, '"}');
+            attributes = string.concat(', {"trait_type": "Background", "value": "', tokenName, '"}');
         }
 
         return attributes;

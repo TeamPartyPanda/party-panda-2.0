@@ -2,16 +2,16 @@
 pragma solidity ^0.8.13;
 
 import "forge-std/Script.sol";
-import "../src/PartyPanda2.sol";
+import "../src/Box.sol";
 
-contract PartyPanda2Script is Script {
+contract BoxScript is Script {
     function setUp() public {}
 
     function run() public {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
         vm.startBroadcast(deployerPrivateKey);
 
-        PartyPanda2 token = new PartyPanda2();
+        Box token = new Box();
 
         vm.stopBroadcast();
     }

@@ -14,7 +14,7 @@ contract NounsGlasses is ERC4883, Colours {
     /// EVENTS
 
     constructor()
-        ERC4883("Nouns Glasses", "PNG", 0.0002020 ether, 0xeB10511109053787b3ED6cc02d5Cb67A265806cC, 200, 2020)
+        ERC4883("Nouns Glasses", "NGLS", 0.0002020 ether, 0xeB10511109053787b3ED6cc02d5Cb67A265806cC, 200, 2020)
     {}
 
     function _generateDescription(uint256 tokenId) internal view virtual override returns (string memory) {
@@ -26,7 +26,7 @@ contract NounsGlasses is ERC4883, Colours {
     }
 
     function _generateAttributes(uint256 tokenId) internal view virtual override returns (string memory) {
-        string memory attributes = string.concat('{"trait_type": "colour", "value": "', _generateColour(tokenId), '"}');
+        string memory attributes = string.concat('{"trait_type": "Colour", "value": "', _generateColour(tokenId), '"}');
 
         return string.concat('"attributes": [', attributes, "]");
     }

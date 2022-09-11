@@ -43,11 +43,11 @@ contract PartyPanda2 is ERC4883Composer, Colours, ERC721Holder {
 
     function _generateAttributes(uint256 tokenId) internal view virtual override returns (string memory) {
         string memory attributes = string.concat(
-            '{"trait_type": "colour", "value": "',
+            '{"trait_type": "Colour", "value": "',
             _generateColour(tokenId),
-            '"}, {"trait_type": "personality", "value": "',
+            '"}, {"trait_type": "Personality", "value": "',
             _generatePersonality(tokenId),
-            '"}, {"trait_type": "party", "value": ',
+            '"}, {"display_type": "boost_percentage", "trait_type": "Party", "value": ',
             _generatePartyValue(tokenId),
             "}",
             _generateAccessoryAttributes(tokenId),
@@ -76,7 +76,7 @@ contract PartyPanda2 is ERC4883Composer, Colours, ERC721Holder {
             '<g id="partypanda-2-0-',
             Strings.toString(tokenId),
             '">' "<desc>Party Panda 2.0 is Copyright 2022 by Alex Party Panda https://github.com/AlexPartyPanda</desc>"
-            '<g stroke="black" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">' '<g fill="',
+            '<g stroke="black" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">' '<g fill="',
             colourValue,
             '">'
             '<path d="M141.746 364.546C88.0896 338.166 67.7686 339.117 54.9706 378.618C58.0112 418.292 64.3272 429.537 80.7686 437.25C104.636 448.709 170.876 432.772 247.283 422.005C354.846 435.377 424.823 445.054 438.422 437.25C458.371 424.569 466.499 414.297 464.22 378.618C445.099 351.034 433.356 339.684 403.243 356.338L365.719 336.403L141.746 364.546Z"/>'
@@ -94,8 +94,8 @@ contract PartyPanda2 is ERC4883Composer, Colours, ERC721Holder {
             "</g>"
             '<path d="M215.622 195.687C226.175 185.133 255.491 189.824 260.182 198.032C248.455 209.758 227.348 207.413 215.622 195.687Z" fill="black"/>'
             '<path d="M221.485 228.521C242.829 237.607 245.499 236.723 263.7 228.521" fill="none"/>' "</g>"
-            '<circle cx="194.169" cy="165.026" r="9.38108" fill="black"/>'
-            '<circle cx="285.98" cy="166.371" r="9.38108" fill="black"/>' "</g>"
+            '<circle cx="194.169" cy="165.026" r="10" fill="black"/>'
+            '<circle cx="285.98" cy="166.371" r="10" fill="black"/>' "</g>"
         );
     }
 
@@ -113,7 +113,7 @@ contract PartyPanda2 is ERC4883Composer, Colours, ERC721Holder {
 
     function _generatePartyValue(uint256 tokenId) internal view returns (string memory) {
         uint256 party = uint256(keccak256(abi.encodePacked("Party", address(this), Strings.toString(tokenId))));
-        return Strings.toString((party % 20) + 3);
+        return Strings.toString((party % 100) + 1);
     }
 
     function tokenName(uint256 tokenId) public view returns (string memory) {
