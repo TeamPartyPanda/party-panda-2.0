@@ -2,20 +2,20 @@
 pragma solidity ^0.8.13;
 
 import "forge-std/Script.sol";
-import "../src/PartyPanda.sol";
+import "../src/PartyPanda2.sol";
 import "../src/NounsGlasses.sol";
 import "../src/Crown.sol";
 import "../src/PartyThought.sol";
 import "../src/Box.sol";
 import {ERC721Holder} from "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 
-contract QAPartyPandaScript is Script, ERC721Holder {
+contract QAPartyPanda2Script is Script, ERC721Holder {
     function setUp() public {}
 
     function run() public {
         vm.broadcast();
 
-        PartyPanda token = new PartyPanda();
+        PartyPanda2 token = new PartyPanda2();
         token.mint{value: token.price()}();
 
         Box background = new Box();

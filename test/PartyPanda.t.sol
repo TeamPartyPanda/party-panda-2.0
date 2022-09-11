@@ -3,13 +3,13 @@ pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
 import "../src/ERC4883.sol";
-import "../src/PartyPanda.sol";
+import "../src/PartyPanda2.sol";
 import "./mocks/MockERC4883.sol";
 import "./mocks/MockERC721.sol";
 import {ERC721Holder} from "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 
-contract PartyPandaTest is Test, ERC721Holder {
-    PartyPanda public token;
+contract PartyPanda2Test is Test, ERC721Holder {
+    PartyPanda2 public token;
     MockERC721 public erc721;
     MockERC4883 public background;
     MockERC4883 public accessory1;
@@ -24,7 +24,7 @@ contract PartyPandaTest is Test, ERC721Holder {
     address constant OTHER_ADDRESS = address(23);
 
     function setUp() public {
-        token = new PartyPanda();
+        token = new PartyPanda2();
         erc721 = new MockERC721("ERC721", "NFT");
         background = new MockERC4883("Background", "BACK", 0, address(42), 10, 100);
         accessory1 = new MockERC4883("Accessory1", "ACC1", 0, address(42), 10, 100);
@@ -95,7 +95,7 @@ contract PartyPandaTest is Test, ERC721Holder {
         token.addAccessory(tokenId, address(accessory3), 1);
 
         accessory4.approve(address(token), 1);
-        vm.expectRevert(PartyPanda.MaximumAccessories.selector);
+        vm.expectRevert(PartyPanda2.MaximumAccessories.selector);
         token.addAccessory(tokenId, address(accessory4), 1);
     }
 
@@ -131,7 +131,7 @@ contract PartyPandaTest is Test, ERC721Holder {
 
         erc721.approve(address(token), accessoryTokenId);
 
-        vm.expectRevert(PartyPanda.NotERC4883.selector);
+        vm.expectRevert(PartyPanda2.NotERC4883.selector);
         token.addAccessory(tokenId, address(erc721), accessoryTokenId);
     }
 
@@ -146,7 +146,7 @@ contract PartyPandaTest is Test, ERC721Holder {
 
         accessory1.approve(address(token), 2);
 
-        vm.expectRevert(PartyPanda.AccessoryAlreadyAdded.selector);
+        vm.expectRevert(PartyPanda2.AccessoryAlreadyAdded.selector);
         token.addAccessory(tokenId, address(accessory1), 2);
     }
 
@@ -160,7 +160,7 @@ contract PartyPandaTest is Test, ERC721Holder {
         accessory1.approve(address(token), accessoryTokenId);
         vm.stopPrank();
 
-        vm.expectRevert(PartyPanda.NotAccessoryOwner.selector);
+        vm.expectRevert(PartyPanda2.NotAccessoryOwner.selector);
         token.addAccessory(tokenId, address(accessory1), accessoryTokenId);
     }
 
@@ -232,7 +232,7 @@ contract PartyPandaTest is Test, ERC721Holder {
         token.mint{value: PRICE}();
         accessory1.mint();
 
-        vm.expectRevert(PartyPanda.AccessoryNotFound.selector);
+        vm.expectRevert(PartyPanda2.AccessoryNotFound.selector);
         token.removeAccessory(tokenId, address(accessory1), accessoryTokenId);
     }
 
@@ -244,7 +244,7 @@ contract PartyPandaTest is Test, ERC721Holder {
         token.mint{value: PRICE}();
         accessory1.mint();
 
-        vm.expectRevert(PartyPanda.AccessoryNotFound.selector);
+        vm.expectRevert(PartyPanda2.AccessoryNotFound.selector);
         token.removeAccessory(tokenId, address(accessory1), otherTokenId);
     }
 
@@ -265,7 +265,7 @@ contract PartyPandaTest is Test, ERC721Holder {
         accessory3.approve(address(token), 1);
         token.addAccessory(tokenId, address(accessory3), 1);
 
-        vm.expectRevert(PartyPanda.AccessoryNotFound.selector);
+        vm.expectRevert(PartyPanda2.AccessoryNotFound.selector);
         token.removeAccessory(tokenId, address(accessory4), 1);
     }
 
@@ -369,7 +369,7 @@ contract PartyPandaTest is Test, ERC721Holder {
 
         erc721.approve(address(token), backgroundTokenId);
 
-        vm.expectRevert(PartyPanda.NotERC4883.selector);
+        vm.expectRevert(PartyPanda2.NotERC4883.selector);
         token.addBackground(tokenId, address(erc721), backgroundTokenId);
     }
 
@@ -384,7 +384,7 @@ contract PartyPandaTest is Test, ERC721Holder {
 
         background.approve(address(token), 2);
 
-        vm.expectRevert(PartyPanda.BackgroundAlreadyAdded.selector);
+        vm.expectRevert(PartyPanda2.BackgroundAlreadyAdded.selector);
         token.addBackground(tokenId, address(background), 2);
     }
 
@@ -398,7 +398,7 @@ contract PartyPandaTest is Test, ERC721Holder {
         background.approve(address(token), backgroundTokenId);
         vm.stopPrank();
 
-        vm.expectRevert(PartyPanda.NotBackgroundOwner.selector);
+        vm.expectRevert(PartyPanda2.NotBackgroundOwner.selector);
         token.addBackground(tokenId, address(background), backgroundTokenId);
     }
 
@@ -449,7 +449,7 @@ contract PartyPandaTest is Test, ERC721Holder {
         token.addBackground(tokenId, address(background), backgroundTokenId);
         token.removeBackground(tokenId);
 
-        vm.expectRevert(PartyPanda.BackgroundAlreadyRemoved.selector);
+        vm.expectRevert(PartyPanda2.BackgroundAlreadyRemoved.selector);
         token.removeBackground(tokenId);
     }
 
@@ -491,7 +491,7 @@ contract PartyPandaTest is Test, ERC721Holder {
 
         uint256 tokenId = 1;
         token.mint{value: PRICE}();
-        vm.expectRevert(PartyPanda.InvalidTokenName.selector);
+        vm.expectRevert(PartyPanda2.InvalidTokenName.selector);
         token.changeTokenName(tokenId, tokenName);
 
         assertEq(token.tokenName(tokenId), string.concat("Party Panda 2.0 #", Strings.toString(tokenId)));

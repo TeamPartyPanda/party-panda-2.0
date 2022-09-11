@@ -7,9 +7,18 @@ import {Colours} from "./Colours.sol";
 import {Base64} from "@openzeppelin/contracts/utils//Base64.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import {IERC165} from "@openzeppelin/contracts/interfaces/IERC165.sol";
+import {IERC721Metadata} from "@openzeppelin/contracts/interfaces/IERC721Metadata.sol";
 import {ERC721Holder} from "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 
-contract PartyPanda is ERC4883, Colours, ERC721Holder {
+//  _________________
+// < Party Panda 2.0 >
+//  -----------------
+//         \   ^__^
+//          \  (oo)\_______
+//             (__)\       )\/\
+//                 ||----w |
+//                 ||     ||
+contract PartyPanda2 is ERC4883, Colours, ERC721Holder {
     /// ERRORS
 
     /// @notice Thrown when attempting to set an invalid token name
@@ -79,7 +88,7 @@ contract PartyPanda is ERC4883, Colours, ERC721Holder {
     {}
 
     function _generateDescription(uint256 tokenId) internal view virtual override returns (string memory) {
-        return name();
+        return "Party Panda 2.0";
     }
 
     function _generateAttributes(uint256 tokenId) internal view virtual override returns (string memory) {
@@ -88,12 +97,42 @@ contract PartyPanda is ERC4883, Colours, ERC721Holder {
             _generateColour(tokenId),
             '"}, {"trait_type": "personality", "value": "',
             _generatePersonality(tokenId),
+            '"}, {"trait_type": "party", "value": ',
+            _generatePartyValue(tokenId),
+            '}',
             //TODO: get name of background and accessories
+            _generateBackgroundAttributes(tokenId),
             //TODO: party power
             '"}'
         );
 
         return string.concat('"attributes": [', attributes, "]");
+    }
+
+    function _generateTokenName(address tokenAddress) internal view virtual returns (string memory) {
+        string memory tokenName = "";
+
+        if (tokenAddress != address(0)) {
+            IERC721Metadata token = IERC721Metadata(tokenAddress);
+
+            if (token.supportsInterface(type(IERC721Metadata).interfaceId)) {
+                tokenName = token.name();
+            }
+        }
+
+        return tokenName;
+    }
+
+    function _generateBackgroundAttributes(uint256 tokenId) internal view virtual returns (string memory) {
+        string memory attributes = "";
+
+        string memory tokenName = _generateTokenName(composables[tokenId].background.tokenAddress);
+
+        if (bytes(tokenName).length != 0) {
+            attributes = string.concat(', {"trait_type": "background", "value": "', tokenName, '"}');
+        }
+
+        return attributes;
     }
 
     function _generateSVG(uint256 tokenId) internal view virtual override returns (string memory) {
@@ -114,7 +153,7 @@ contract PartyPanda is ERC4883, Colours, ERC721Holder {
         return string.concat(
             '<g id="partypanda-2-0-',
             Strings.toString(tokenId),
-            '">' "<desc>Party Panda is Copyright 2022 by Alex Party Panda https://github.com/AlexPartyPanda</desc>"
+            '">' "<desc>Party Panda 2.0 is Copyright 2022 by Alex Party Panda https://github.com/AlexPartyPanda</desc>"
             '<g stroke="black" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">' '<g fill="',
             colourValue,
             '">'
@@ -180,6 +219,15 @@ contract PartyPanda is ERC4883, Colours, ERC721Holder {
         uint256 id = uint256(keccak256(abi.encodePacked("Personality", address(this), Strings.toString(tokenId))));
         id = id % personalities.length;
         return personalities[id];
+    }
+
+    function _generatePartyValue(uint256 tokenId)
+        internal
+        view
+        returns (string memory)
+    {
+        uint256 party = uint256(keccak256(abi.encodePacked("Party", address(this), Strings.toString(tokenId))));
+        return Strings.toString((party % 20) + 3);
     }
 
     function renderTokenById(uint256 tokenId) public view virtual override returns (string memory) {

@@ -2,15 +2,15 @@
 pragma solidity ^0.8.13;
 
 import "forge-std/Script.sol";
-import "../src/PartyPanda.sol";
+import "../src/PartyPanda2.sol";
 
-contract PartyPandaScript is Script {
+contract PartyPanda2Script is Script {
     function setUp() public {}
 
     function run() public {
         vm.broadcast();
 
-        PartyPanda token = new PartyPanda();
+        PartyPanda2 token = new PartyPanda2();
 
         vm.stopBroadcast();
     }
