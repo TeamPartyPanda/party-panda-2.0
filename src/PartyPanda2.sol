@@ -100,9 +100,8 @@ contract PartyPanda2 is ERC4883, Colours, ERC721Holder {
             '"}, {"trait_type": "party", "value": ',
             _generatePartyValue(tokenId),
             '}',
-            //TODO: get name of background and accessories
+            _generateAccessoryAttributes(tokenId),
             _generateBackgroundAttributes(tokenId),
-            //TODO: party power
             '"}'
         );
 
@@ -121,6 +120,27 @@ contract PartyPanda2 is ERC4883, Colours, ERC721Holder {
         }
 
         return tokenName;
+    }
+
+    function _generateAccessoryAttributes(uint256 tokenId) internal view virtual returns (string memory) {
+        string memory attributes = "";
+
+        string memory tokenName;
+
+        uint256 accessoryCount = composables[tokenId].accessories.length;
+        for (uint256 index = 0; index < accessoryCount;) {
+                    tokenName = _generateTokenName(composables[tokenId].accessories[index].tokenAddress);
+
+        if (bytes(tokenName).length != 0) {
+            attributes = string.concat(attributes, ', {"trait_type": "accessory', Strings.toString(index + 1), '", "value": "', tokenName, '"}');
+        }
+
+            unchecked {
+                ++index;
+            }
+        }
+
+        return attributes;
     }
 
     function _generateBackgroundAttributes(uint256 tokenId) internal view virtual returns (string memory) {
