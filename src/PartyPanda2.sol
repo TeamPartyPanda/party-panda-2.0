@@ -10,14 +10,14 @@ import {IERC165} from "@openzeppelin/contracts/interfaces/IERC165.sol";
 import {IERC721Metadata} from "@openzeppelin/contracts/interfaces/IERC721Metadata.sol";
 import {ERC721Holder} from "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 
-//  _________________
-// < Party Panda 2.0 >
-//  -----------------
-//         \   ^__^
-//          \  (oo)\_______
-//             (__)\       )\/\
-//                 ||----w |
-//                 ||     ||
+// ______          _          ______               _         _____  _____ 
+// | ___ \        | |         | ___ \             | |       / __  \|  _  |
+// | |_/ /_ _ _ __| |_ _   _  | |_/ /_ _ _ __   __| | __ _  `' / /'| |/' |
+// |  __/ _` | '__| __| | | | |  __/ _` | '_ \ / _` |/ _` |   / /  |  /| |
+// | | | (_| | |  | |_| |_| | | | | (_| | | | | (_| | (_| | ./ /___\ |_/ /
+// \_|  \__,_|_|   \__|\__, | \_|  \__,_|_| |_|\__,_|\__,_| \_____(_)___/ 
+//                      __/ |                                             
+//                     |___/                                              
 contract PartyPanda2 is ERC4883Composer, Colours, ERC721Holder {
     /// ERRORS
 
@@ -202,3 +202,12 @@ contract PartyPanda2 is ERC4883Composer, Colours, ERC721Holder {
         return true;
     }
 }
+
+//  _________________
+// < Party Panda 2.0 >
+//  -----------------
+//         \   ^__^
+//          \  (oo)\_______
+//             (__)\       )\/\
+//                 ||----w |
+//                 ||     ||
