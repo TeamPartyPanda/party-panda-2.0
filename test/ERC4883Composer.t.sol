@@ -53,6 +53,38 @@ contract ERC4883ComposerTest is Test, ERC721Holder {
         assertEq(token.supportsInterface(type(IERC4883).interfaceId), true);
     }
 
+    function testRenderTokenById() public {
+        uint256 tokenId = 1;
+        token.mint{value: PRICE}();
+
+        string memory renderedOutput = token.renderTokenById(tokenId);
+
+        accessory1.mint();
+        accessory2.mint();
+        accessory3.mint();
+
+        accessory1.approve(address(token), 1);
+        token.addAccessory(tokenId, address(accessory1), 1);
+
+        accessory2.approve(address(token), 1);
+        token.addAccessory(tokenId, address(accessory2), 1);
+
+        accessory3.approve(address(token), 1);
+        token.addAccessory(tokenId, address(accessory3), 1);
+
+        background.mint();
+
+        background.approve(address(token), 1);
+        token.addBackground(tokenId, address(background), 1);
+
+        string memory renderedOutputWithBackgroundAndAccessories = token.renderTokenById(tokenId);
+
+        assertTrue(
+            keccak256(abi.encodePacked(renderedOutput))
+                != keccak256(abi.encodePacked(renderedOutputWithBackgroundAndAccessories))
+        );
+    }
+
     // Accessories
     function testAddAccessory() public {
         uint256 tokenId = 1;

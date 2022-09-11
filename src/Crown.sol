@@ -16,7 +16,11 @@ contract Crown is ERC4883, Colours {
     constructor() ERC4883("Crown", "CRWN", 0.000888 ether, 0xeB10511109053787b3ED6cc02d5Cb67A265806cC, 200, 2020) {}
 
     function _generateDescription(uint256 tokenId) internal view virtual override returns (string memory) {
-        return "Crown emoji designed by OpenMoji (the open-source emoji and icon project). License: CC BY-SA 4.0";
+        return string.concat(
+            "Crown.  #",
+            Strings.toString(tokenId),
+            ".  ERC4883 composable NFT.  Crown emoji designed by OpenMoji (the open-source emoji and icon project). License: CC BY-SA 4.0"
+        );
     }
 
     function _generateAttributes(uint256 tokenId) internal view virtual override returns (string memory) {

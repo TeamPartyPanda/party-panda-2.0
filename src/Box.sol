@@ -16,7 +16,7 @@ contract Box is ERC4883, Colours {
     constructor() ERC4883("Box", "BOX", 0.00042 ether, 0xeB10511109053787b3ED6cc02d5Cb67A265806cC, 100, 1000) {}
 
     function _generateDescription(uint256 tokenId) internal view virtual override returns (string memory) {
-        return "Box";
+        return string.concat("Box.  #", Strings.toString(tokenId), ".  ERC4883 composable NFT.");
     }
 
     function _generateAttributes(uint256 tokenId) internal view virtual override returns (string memory) {

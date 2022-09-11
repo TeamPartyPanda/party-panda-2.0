@@ -38,7 +38,7 @@ contract PartyPanda2 is ERC4883Composer, Colours, ERC721Holder {
     {}
 
     function _generateDescription(uint256 tokenId) internal view virtual override returns (string memory) {
-        return "Party Panda 2.0";
+        return string.concat("Party Panda 2.0.  Panda #", Strings.toString(tokenId), ".  ERC4883 composable NFT");
     }
 
     function _generateAttributes(uint256 tokenId) internal view virtual override returns (string memory) {
@@ -49,7 +49,7 @@ contract PartyPanda2 is ERC4883Composer, Colours, ERC721Holder {
             _generatePersonality(tokenId),
             '"}, {"trait_type": "party", "value": ',
             _generatePartyValue(tokenId),
-            '}',
+            "}",
             _generateAccessoryAttributes(tokenId),
             _generateBackgroundAttributes(tokenId),
             '"}'
@@ -57,6 +57,7 @@ contract PartyPanda2 is ERC4883Composer, Colours, ERC721Holder {
 
         return string.concat('"attributes": [', attributes, "]");
     }
+
     function _generateSVG(uint256 tokenId) internal view virtual override returns (string memory) {
         string memory svg = string.concat(
             '<svg id="partypanda-2-0" width="500" height="500" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">',
@@ -111,21 +112,9 @@ contract PartyPanda2 is ERC4883Composer, Colours, ERC721Holder {
         return personalities[id];
     }
 
-    function _generatePartyValue(uint256 tokenId)
-        internal
-        view
-        returns (string memory)
-    {
+    function _generatePartyValue(uint256 tokenId) internal view returns (string memory) {
         uint256 party = uint256(keccak256(abi.encodePacked("Party", address(this), Strings.toString(tokenId))));
         return Strings.toString((party % 20) + 3);
-    }
-
-    function renderTokenById(uint256 tokenId) public view virtual override returns (string memory) {
-        if (!_exists(tokenId)) {
-            revert NonexistentToken();
-        }
-
-        return string.concat(_generateBackground(tokenId), _generateSVGBody(tokenId), _generateAccessories(tokenId));
     }
 
     function tokenName(uint256 tokenId) public view returns (string memory) {

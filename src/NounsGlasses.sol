@@ -18,7 +18,11 @@ contract NounsGlasses is ERC4883, Colours {
     {}
 
     function _generateDescription(uint256 tokenId) internal view virtual override returns (string memory) {
-        return name();
+        return string.concat(
+            "Nouns Glasses.  #",
+            Strings.toString(tokenId),
+            ".  ERC4883 composable NFT.  Nouns Glasses are inspired and derived from Nouns"
+        );
     }
 
     function _generateAttributes(uint256 tokenId) internal view virtual override returns (string memory) {

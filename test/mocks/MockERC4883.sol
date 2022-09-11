@@ -2,6 +2,7 @@
 pragma solidity ^0.8.13;
 
 import {ERC4883} from "../../src/ERC4883.sol";
+import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 
 contract MockERC4883 is ERC4883 {
     constructor(
@@ -16,7 +17,7 @@ contract MockERC4883 is ERC4883 {
     {}
 
     function _generateDescription(uint256 tokenId) internal view virtual override returns (string memory) {
-        return name();
+        return string.concat(name(), " #", Strings.toString(tokenId));
     }
 
     function _generateAttributes(uint256 tokenId) internal view virtual override returns (string memory) {
@@ -24,10 +25,10 @@ contract MockERC4883 is ERC4883 {
     }
 
     function _generateSVG(uint256 tokenId) internal view virtual override returns (string memory) {
-        return "<svg></svg>";
+        return string.concat('<svg id="', Strings.toString(tokenId), "></svg>");
     }
 
     function _generateSVGBody(uint256 tokenId) internal view virtual override returns (string memory) {
-        return "<g></g>";
+        return string.concat('<g id="', Strings.toString(tokenId), "></g>");
     }
 }

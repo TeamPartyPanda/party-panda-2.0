@@ -3,7 +3,6 @@ pragma solidity ^0.8.13;
 
 import {ERC4883} from "./ERC4883.sol";
 import {IERC4883} from "./IERC4883.sol";
-import {Colours} from "./Colours.sol";
 import {Base64} from "@openzeppelin/contracts/utils//Base64.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import {IERC165} from "@openzeppelin/contracts/interfaces/IERC165.sol";
@@ -65,12 +64,14 @@ abstract contract ERC4883Composer is ERC4883 {
 
     mapping(uint256 => Composable) public composables;
 
-    constructor(string memory name_,
+    constructor(
+        string memory name_,
         string memory symbol_,
         uint256 price_,
         address owner_,
         uint256 ownerAllocation_,
-        uint256 supplyCap_)
+        uint256 supplyCap_
+    )
         ERC4883(name_, symbol_, price_, owner_, ownerAllocation_, supplyCap_)
     {}
 
@@ -95,11 +96,18 @@ abstract contract ERC4883Composer is ERC4883 {
 
         uint256 accessoryCount = composables[tokenId].accessories.length;
         for (uint256 index = 0; index < accessoryCount;) {
-                    tokenName = _generateTokenName(composables[tokenId].accessories[index].tokenAddress);
+            tokenName = _generateTokenName(composables[tokenId].accessories[index].tokenAddress);
 
-        if (bytes(tokenName).length != 0) {
-            attributes = string.concat(attributes, ', {"trait_type": "accessory', Strings.toString(index + 1), '", "value": "', tokenName, '"}');
-        }
+            if (bytes(tokenName).length != 0) {
+                attributes = string.concat(
+                    attributes,
+                    ', {"trait_type": "accessory',
+                    Strings.toString(index + 1),
+                    '", "value": "',
+                    tokenName,
+                    '"}'
+                );
+            }
 
             unchecked {
                 ++index;

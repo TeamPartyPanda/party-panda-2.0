@@ -10,7 +10,7 @@ contract PartyPanda2Script is Script {
     function run() public {
         vm.broadcast();
 
-        PartyPanda2 token = new PartyPanda2();
+        new PartyPanda2();
 
         vm.stopBroadcast();
     }

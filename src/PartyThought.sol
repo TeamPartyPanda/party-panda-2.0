@@ -18,12 +18,15 @@ contract PartyThought is ERC4883, Colours {
     {}
 
     function _generateDescription(uint256 tokenId) internal view virtual override returns (string memory) {
-        return
-        "Thought balloon emoji designed by OpenMoji (the open-source emoji and icon project). License: CC BY-SA 4.0";
+        return string.concat(
+            "Party Thought.  #",
+            Strings.toString(tokenId),
+            ".  ERC4883 composable NFT.  Thought balloon emoji designed by OpenMoji (the open-source emoji and icon project). License: CC BY-SA 4.0"
+        );
     }
 
     function _generateAttributes(uint256 tokenId) internal view virtual override returns (string memory) {
-        string memory attributes = string.concat('{"trait_type": "colour", "value": "', _generateColour(tokenId), '"}');
+        string memory attributes = string.concat("{}");
 
         return string.concat('"attributes": [', attributes, "]");
     }
@@ -39,8 +42,6 @@ contract PartyThought is ERC4883, Colours {
     }
 
     function _generateSVGBody(uint256 tokenId) internal view virtual override returns (string memory) {
-        string memory colourValue = _generateColour(tokenId);
-
         return string.concat(
             '<g id="party-thought-',
             Strings.toString(tokenId),
