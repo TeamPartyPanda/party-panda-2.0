@@ -13,7 +13,7 @@ contract NounsGlassesTest is Test, ERC721Holder {
     string public constant SYMBOL = "NGLS";
     uint256 public constant OWNER_ALLOCATION = 200;
     uint256 public constant SUPPLY_CAP = 2020;
-    uint256 constant PRICE = 0.0002020 ether;
+    uint256 constant PRICE = 0.000202 ether;
     address constant OWNER = 0xeB10511109053787b3ED6cc02d5Cb67A265806cC;
 
     string constant TOKEN_NAME = "Token Name";
