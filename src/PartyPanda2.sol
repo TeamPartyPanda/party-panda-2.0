@@ -10,14 +10,14 @@ import {IERC165} from "@openzeppelin/contracts/interfaces/IERC165.sol";
 import {IERC721Metadata} from "@openzeppelin/contracts/interfaces/IERC721Metadata.sol";
 import {ERC721Holder} from "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 
-// ______          _          ______               _         _____  _____ 
+// ______          _          ______               _         _____  _____
 // | ___ \        | |         | ___ \             | |       / __  \|  _  |
 // | |_/ /_ _ _ __| |_ _   _  | |_/ /_ _ _ __   __| | __ _  `' / /'| |/' |
 // |  __/ _` | '__| __| | | | |  __/ _` | '_ \ / _` |/ _` |   / /  |  /| |
 // | | | (_| | |  | |_| |_| | | | | (_| | | | | (_| | (_| | ./ /___\ |_/ /
-// \_|  \__,_|_|   \__|\__, | \_|  \__,_|_| |_|\__,_|\__,_| \_____(_)___/ 
-//                      __/ |                                             
-//                     |___/                                              
+// \_|  \__,_|_|   \__|\__, | \_|  \__,_|_| |_|\__,_|\__,_| \_____(_)___/
+//                      __/ |
+//                     |___/
 contract PartyPanda2 is ERC4883Composer, Colours, ERC721Holder {
     /// ERRORS
 
@@ -64,7 +64,7 @@ contract PartyPanda2 is ERC4883Composer, Colours, ERC721Holder {
             _generateColour(tokenId),
             '"}, {"trait_type": "Personality", "value": "',
             _generatePersonality(tokenId),
-            '"}, {"display_type": "boost_percentage", "trait_type": "Party", "value": ',
+            '"}, {"trait_type": "Party", "value": ',
             _generatePartyValue(tokenId),
             "}",
             _generateAccessoryAttributes(tokenId),
@@ -130,7 +130,7 @@ contract PartyPanda2 is ERC4883Composer, Colours, ERC721Holder {
 
     function _generatePartyValue(uint256 tokenId) internal view returns (string memory) {
         uint256 party = uint256(keccak256(abi.encodePacked("Party", address(this), Strings.toString(tokenId))));
-        return Strings.toString((party % 100) + 1);
+        return Strings.toString((party % 10) + 1);
     }
 
     function tokenName(uint256 tokenId) public view returns (string memory) {
@@ -210,4 +210,3 @@ contract PartyPanda2 is ERC4883Composer, Colours, ERC721Holder {
 //          \  (oo)\_______
 //             (__)\       )\/\
 //                 ||----w |
-//                 ||     ||
