@@ -133,15 +133,18 @@ contract PartyPanda2 is ERC4883Composer, Colours, ERC721Holder {
         return Strings.toString((party % 10) + 1);
     }
 
-    function tokenName(uint256 tokenId) public view returns (string memory) {
+    function _generateTokenName(uint256 tokenId) internal view virtual override returns (string memory) {
         string memory _name = _names[tokenId];
 
-        bytes memory b = bytes(_name);
-        if (b.length < 1) {
+        if (bytes(_name).length < 1) {
             _name = string.concat(name(), " #", Strings.toString(tokenId));
         }
 
         return _name;
+    }
+
+    function tokenName(uint256 tokenId) public view returns (string memory) {
+        return _generateTokenName(tokenId);
     }
 
     // Based on The HashMarks
