@@ -8,13 +8,16 @@ import {Base64} from "@openzeppelin/contracts/utils//Base64.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import {IERC165} from "@openzeppelin/contracts/interfaces/IERC165.sol";
 
+// ░█▀█░█▀█░█▀▄░▀█▀░█░█░░░▀█▀░█░█░█▀█░█░█░█▀▀░█░█░▀█▀
+// ░█▀▀░█▀█░█▀▄░░█░░░█░░░░░█░░█▀█░█░█░█░█░█░█░█▀█░░█░
+// ░▀░░░▀░▀░▀░▀░░▀░░░▀░░░░░▀░░▀░▀░▀▀▀░▀▀▀░▀▀▀░▀░▀░░▀░
 contract PartyThought is ERC4883, Colours {
     /// ERRORS
 
     /// EVENTS
 
     constructor()
-        ERC4883("Party Thought", "THGHT", 0.000888 ether, 0xeB10511109053787b3ED6cc02d5Cb67A265806cC, 200, 2020)
+        ERC4883("Party Thought", "THGHT", 0.000999 ether, 0xeB10511109053787b3ED6cc02d5Cb67A265806cC, 10, 100)
     {}
 
     function _generateDescription(uint256 tokenId) internal view virtual override returns (string memory) {
