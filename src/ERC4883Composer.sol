@@ -211,7 +211,7 @@ abstract contract ERC4883Composer is ERC4883 {
         emit AccessoryAdded(tokenId, accessoryTokenAddress, accessoryTokenId);
     }
 
-    function removeAccessory(uint256 tokenId, address accessoryTokenAddress, uint256 accessoryTokenId) public {
+    function removeAccessory(uint256 tokenId, address accessoryTokenAddress) public {
         address tokenOwner = ownerOf(tokenId);
         if (tokenOwner != msg.sender) {
             revert NotTokenOwner();
@@ -224,7 +224,6 @@ abstract contract ERC4883Composer is ERC4883 {
         for (; index < accessoryCount;) {
             if (
                 composables[tokenId].accessories[index].tokenAddress == accessoryTokenAddress
-                    && composables[tokenId].accessories[index].tokenId == accessoryTokenId
             ) {
                 accessoryFound = true;
                 break;

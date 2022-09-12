@@ -220,7 +220,7 @@ contract ERC4883ComposerTest is Test, ERC721Holder {
 
         accessory1.approve(address(token), accessoryTokenId);
         token.addAccessory(tokenId, address(accessory1), accessoryTokenId);
-        token.removeAccessory(tokenId, address(accessory1), accessoryTokenId);
+        token.removeAccessory(tokenId, address(accessory1));
 
         assertEq(accessory1.balanceOf(address(this)), 1);
     }
@@ -241,9 +241,9 @@ contract ERC4883ComposerTest is Test, ERC721Holder {
         accessory3.approve(address(token), 1);
         token.addAccessory(tokenId, address(accessory3), 1);
 
-        token.removeAccessory(tokenId, address(accessory1), 1);
-        token.removeAccessory(tokenId, address(accessory2), 1);
-        token.removeAccessory(tokenId, address(accessory3), 1);
+        token.removeAccessory(tokenId, address(accessory1));
+        token.removeAccessory(tokenId, address(accessory2));
+        token.removeAccessory(tokenId, address(accessory3));
     }
 
     function testRemoveAccessoryNotTokenOwner(address notTokenOwner) public {
@@ -259,7 +259,7 @@ contract ERC4883ComposerTest is Test, ERC721Holder {
 
         vm.expectRevert(ERC4883.NotTokenOwner.selector);
         vm.prank(notTokenOwner);
-        token.removeAccessory(tokenId, address(accessory1), accessoryTokenId);
+        token.removeAccessory(tokenId, address(accessory1));
     }
 
     function testRemoveAccessoryAccessoryNotFound(address notTokenOwner) public {
@@ -271,7 +271,7 @@ contract ERC4883ComposerTest is Test, ERC721Holder {
         accessory1.mint();
 
         vm.expectRevert(ERC4883Composer.AccessoryNotFound.selector);
-        token.removeAccessory(tokenId, address(accessory1), accessoryTokenId);
+        token.removeAccessory(tokenId, address(accessory1));
     }
 
     function testRemoveAccessoryDifferentTokenIdAccessoryNotFound(address notTokenOwner, uint256 otherTokenId) public {
@@ -283,7 +283,7 @@ contract ERC4883ComposerTest is Test, ERC721Holder {
         accessory1.mint();
 
         vm.expectRevert(ERC4883Composer.AccessoryNotFound.selector);
-        token.removeAccessory(tokenId, address(accessory1), otherTokenId);
+        token.removeAccessory(tokenId, address(accessory1));
     }
 
     function testRemoveAccessoriesAccessoryNotFound() public {
@@ -304,7 +304,7 @@ contract ERC4883ComposerTest is Test, ERC721Holder {
         token.addAccessory(tokenId, address(accessory3), 1);
 
         vm.expectRevert(ERC4883Composer.AccessoryNotFound.selector);
-        token.removeAccessory(tokenId, address(accessory4), 1);
+        token.removeAccessory(tokenId, address(accessory4));
     }
 
     function testRemoveAccessory1() public {
@@ -323,7 +323,7 @@ contract ERC4883ComposerTest is Test, ERC721Holder {
         accessory3.approve(address(token), 1);
         token.addAccessory(tokenId, address(accessory3), 1);
 
-        token.removeAccessory(tokenId, address(accessory1), 1);
+        token.removeAccessory(tokenId, address(accessory1));
     }
 
     function testRemoveAccessory2() public {
@@ -342,7 +342,7 @@ contract ERC4883ComposerTest is Test, ERC721Holder {
         accessory3.approve(address(token), 1);
         token.addAccessory(tokenId, address(accessory3), 1);
 
-        token.removeAccessory(tokenId, address(accessory2), 1);
+        token.removeAccessory(tokenId, address(accessory2));
     }
 
     function testRemoveAccessory3() public {
@@ -361,7 +361,7 @@ contract ERC4883ComposerTest is Test, ERC721Holder {
         accessory3.approve(address(token), 1);
         token.addAccessory(tokenId, address(accessory3), 1);
 
-        token.removeAccessory(tokenId, address(accessory3), 1);
+        token.removeAccessory(tokenId, address(accessory3));
     }
 
     // Background
