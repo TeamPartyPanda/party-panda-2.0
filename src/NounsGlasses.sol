@@ -8,12 +8,12 @@ import {Base64} from "@openzeppelin/contracts/utils//Base64.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import {IERC165} from "@openzeppelin/contracts/interfaces/IERC165.sol";
 
-//      __                          ___ _                         
-//   /\ \ \___  _   _ _ __  ___    / _ \ | __ _ ___ ___  ___  ___ 
+//      __                          ___ _
+//   /\ \ \___  _   _ _ __  ___    / _ \ | __ _ ___ ___  ___  ___
 //  /  \/ / _ \| | | | '_ \/ __|  / /_\/ |/ _` / __/ __|/ _ \/ __|
 // / /\  / (_) | |_| | | | \__ \ / /_\\| | (_| \__ \__ \  __/\__ \
 // \_\ \/ \___/ \__,_|_| |_|___/ \____/|_|\__,_|___/___/\___||___/
-//                                                               
+//
 contract NounsGlasses is ERC4883, Colours {
     /// ERRORS
 

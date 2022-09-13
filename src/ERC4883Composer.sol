@@ -222,9 +222,7 @@ abstract contract ERC4883Composer is ERC4883 {
         bool accessoryFound = false;
         uint256 index = 0;
         for (; index < accessoryCount;) {
-            if (
-                composables[tokenId].accessories[index].tokenAddress == accessoryTokenAddress
-            ) {
+            if (composables[tokenId].accessories[index].tokenAddress == accessoryTokenAddress) {
                 accessoryFound = true;
                 break;
             }
